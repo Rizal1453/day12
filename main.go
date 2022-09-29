@@ -37,7 +37,7 @@ func main() {
 	route.HandleFunc("/form-contact",AddContact).Methods("POST")
 	route.HandleFunc("/delete-blog/{id}",deleteBlog).Methods("GET")
 	route.HandleFunc("/edit-project/{id}",editBlog).Methods("GET")
-	route.HandleFunc("/submitedit/{id}",submitEdit).Methods("POST")
+	route.HandleFunc("/submitedit/{id}",middleware.UploadFile2(submitEdit)).Methods("POST")
 	// register
 	route.HandleFunc("/form-register",formRegister).Methods("GET")
 	route.HandleFunc("/submit-register",register).Methods("POST")
@@ -92,17 +92,19 @@ func home(w http.ResponseWriter, r *http.Request){
 	}
 	Data.FlashData = strings.Join(flashes, " ")
 
-	data,err :=connection.Conn.Query(context.Background(),"SELECT tb_projects.id, tb_projects.name, description, duration,image, tb_user.name as author FROM tb_projects LEFT JOIN tb_user ON tb_projects.author_id = tb_user.id ORDER BY id DESC")
+	data,err :=connection.Conn.Query(context.Background(),"SELECT tb_projects.id, tb_projects.name, description, duration,technologi,image, tb_user.name as author FROM tb_projects LEFT JOIN tb_user ON tb_projects.author_id = tb_user.id ORDER BY id DESC")
 	var result[]Project
 	for data.Next(){
 		var each = Project{}
-		err:= data.Scan(&each.ID,&each.NamaProject,&each.Description,&each.Duration,&each.Image,&each.Author)
+		err:= data.Scan(&each.ID,&each.NamaProject,&each.Description,&each.Duration,&each.Tech,&each.Image,&each.Author)
 		if err != nil{
 			fmt.Println(err.Error())
 			return
 		}
+		fmt.Println(each.Tech)
 		result = append(result, each)
 	}
+	
 	resData :=map[string]interface{}{
 		"DataSession" : Data,
 		"Blogs":result,
@@ -140,14 +142,11 @@ type Project struct{
 	StartDate time.Time
 	EndDate time.Time
 	Description string
-	NodeJs string
-	VueJs string
-	ReactJs string
-	Java string
 	Duration string
 	ID int
 	Format_Start_date string
 	Format_End_date string
+	Tech [] string
 	Author string
 	IsLogin int
 	Image string
@@ -171,6 +170,9 @@ func AddProject(w http.ResponseWriter,r *http.Request){
 	// var vueJs = r.PostForm.Get("vuejs")
 	// var reactJs = r.PostForm.Get("reactjs") 
 	// var java = r.PostForm.Get("java")
+	var tech []string
+	tech = r.Form["technologies"]
+
 	dataContext := r.Context().Value("dataFile")
 	image := dataContext.(string)
 
@@ -203,7 +205,7 @@ func AddProject(w http.ResponseWriter,r *http.Request){
 		duration = strconv.Itoa(int(years)) + " years"
 	}
 
-	_,err = connection.Conn.Exec(context.Background(), "INSERT INTO tb_projects (name, description,start_date, end_date,duration,author_id,image) VALUES ($1, $2, $3, $4, $5,$6,$7)", namaProject, description, startDateParse, endDateParse, duration,author,image)
+	_,err = connection.Conn.Exec(context.Background(), "INSERT INTO tb_projects (name, description,start_date, end_date,duration,technologi,author_id,image) VALUES ($1, $2, $3, $4, $5,$6,$7,$8)", namaProject, description, startDateParse, endDateParse, duration,tech,author,image)
 	if err != nil {
 		w.WriteHeader(http.StatusInternalServerError)
 		w.Write([]byte("message : "+ err.Error()))
@@ -328,7 +330,10 @@ func submitEdit(w http.ResponseWriter, r *http.Request){
 	// } else {
 	// 	duration = "0 Days"
 	// }
-	_,err = connection.Conn.Exec(context.Background(), "UPDATE tb_projects SET name = $1, description = $2 WHERE id = $3", namaProject, description, id)
+	dataContext := r.Context().Value("dataFile")
+	image := dataContext.(string)
+
+	_,err = connection.Conn.Exec(context.Background(), "UPDATE tb_projects SET name = $1, description = $2, image = $3 WHERE id = $4", namaProject, description,image, id)
 
 
 

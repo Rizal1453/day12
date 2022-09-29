@@ -93,10 +93,17 @@
                 <p class="text-muted">Duration : {{$data.Duration}} | {{$data.Author}}</p>
                 <p>{{$data.Description}}</p>
                 <div class="icon-sosmed">
-                  <i class="fa-brands fa-react fs-3 me-2"></i>
-                  <i class="fa-brands fa-node fs-3 me-2"></i>
-                  <i class="fa-brands fa-golang fs-3 me-2"></i>
-                  <i class="fa-brands fa-vuejs fs-3 me-2"></i>
+                  {{range $index, $item := $data.Tech}}
+                    {{if eq $item "react" }}
+                        <i class="fa-brands fa-react fs-3 me-2"></i>
+                    {{else if eq $item "node"}}
+                        <i class="fa-brands fa-node-js fs-3 me-2"></i>
+                    {{else if eq $item "golang"}}
+                        <i class="fa-brands fa-golang fs-3 me-2"></i>
+                    {{else if eq $item "vue"}}
+                        <i class="fa-brands fa-vuejs fs-3 me-2"></i>
+                    {{end}}
+                  {{end}}
                 </div>
                 <div class="mt-3 d-flex justify-content-evenly">
                   <a href="/edit-project/{{$data.ID}}" class="btn btn-dark px-5">edit</a>
