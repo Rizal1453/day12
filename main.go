@@ -92,11 +92,15 @@ func home(w http.ResponseWriter, r *http.Request){
 	}
 	Data.FlashData = strings.Join(flashes, " ")
 
-	data,err :=connection.Conn.Query(context.Background(),"SELECT tb_projects.id, tb_projects.name, description, duration,technologi,image, tb_user.name as author FROM tb_projects LEFT JOIN tb_user ON tb_projects.author_id = tb_user.id ORDER BY id DESC")
+	
+
+	if session.Values["IsLogin"] != true {
+
+	data,_ :=connection.Conn.Query(context.Background(),"SELECT tb_projects.id, tb_projects.name, description, duration,technologi,image FROM tb_projects ORDER BY id DESC")
 	var result[]Project
 	for data.Next(){
 		var each = Project{}
-		err:= data.Scan(&each.ID,&each.NamaProject,&each.Description,&each.Duration,&each.Tech,&each.Image,&each.Author)
+		err:= data.Scan(&each.ID,&each.NamaProject,&each.Description,&each.Duration,&each.Tech,&each.Image)
 		if err != nil{
 			fmt.Println(err.Error())
 			return
@@ -112,6 +116,33 @@ func home(w http.ResponseWriter, r *http.Request){
 	w.WriteHeader(http.StatusOK)
 
 	tmpl.Execute(w,resData)
+	} else {
+
+	sessionID := session.Values["ID"].(int)
+		fmt.Println(sessionID)
+	data,_ :=connection.Conn.Query(context.Background(),"SELECT tb_projects.id, tb_projects.name, description, duration,technologi,image FROM tb_projects WHERE tb_projects.author_id = $1 ORDER BY id DESC",sessionID)
+	var result[]Project
+	for data.Next(){
+		var each = Project{}
+		err:= data.Scan(&each.ID,&each.NamaProject,&each.Description,&each.Duration,&each.Tech,&each.Image)
+		if err != nil{
+			fmt.Println(err.Error())
+			return
+		}
+		fmt.Println(each.Tech)
+		result = append(result, each)
+	}
+	
+	resData :=map[string]interface{}{
+		"DataSession" : Data,
+		"Blogs":result,
+	}
+	w.WriteHeader(http.StatusOK)
+
+	tmpl.Execute(w,resData)
+}
+	
+		
 }
 func contact(w http.ResponseWriter, r *http.Request){
 	w.Header().Set("Content-Type","text/html; charset=utf8")
@@ -390,7 +421,22 @@ func formLogin(w http.ResponseWriter, r *http.Request){
 	if err != nil{
 		w.Write([]byte("message : "))
 	}
-	tmpl.Execute (w,nil)
+	var store = sessions.NewCookieStore([]byte("SESSION_KEY"))
+	session, _ := store.Get(r, "SESSION_KEY")
+
+	fm := session.Flashes("message")
+
+	var flashes []string
+
+	if len(fm) > 0 {
+		session.Save(r,w)
+		for _, f1 := range fm {
+			flashes = append(flashes, f1.(string))
+		}
+	}
+
+	Data.FlashData = strings.Join(flashes, "")
+	tmpl.Execute(w, Data)
 }
 func login(w http.ResponseWriter, r *http.Request){
 	err := r.ParseForm()
@@ -407,18 +453,27 @@ func login(w http.ResponseWriter, r *http.Request){
 		"SELECT * FROM tb_user WHERE email=$1", email).Scan(&user.ID, &user.Name, &user.Email, &user.Password)
 
 	if err != nil {
-		fmt.Println("Email belum terdaftar")
+		var store = sessions.NewCookieStore([]byte("SESSION_KEY"))
+		session, _ := store.Get(r, "SESSION_KEY")
+
+		session.AddFlash("Email belum terdaftar!", "message")
+		session.Save(r, w)
+
 		http.Redirect(w, r, "/form-login", http.StatusMovedPermanently)
-	
 		return
+		
 	}
 
 	// melakukan pengecekan password
 	err = bcrypt.CompareHashAndPassword([]byte(user.Password), []byte(password))
 	if err != nil {
-		fmt.Println("Password salah")
-		w.WriteHeader(http.StatusBadRequest)
-		w.Write([]byte("message : Password salah " + err.Error()))
+		var store = sessions.NewCookieStore([]byte("SESSION_KEY"))
+		session, _ := store.Get(r, "SESSION_KEY")
+
+		session.AddFlash("Password Salah!", "message")
+		session.Save(r, w)
+
+		http.Redirect(w, r, "/form-login", http.StatusMovedPermanently)
 		return
 	}
 
