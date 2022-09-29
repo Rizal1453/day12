@@ -1,0 +1,18 @@
+.bg-lightgrey{
+    background-color: hsl(216, 16%, 94%);
+}
+body{
+    background-color: hsl(0, 0%, 83%);
+}
+.content{
+    width: 1200px !important;
+}
+.content i{
+    margin: 15px;
+}
+.sosmed i img{
+    width: 35px;
+}
+.content-card{
+    word-break: break-all !important
+}

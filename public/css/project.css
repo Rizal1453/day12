@@ -1,0 +1,15 @@
+.bg-lightgrey{
+    background-color: hsl(216, 16%, 94%);
+}
+body{
+    background-color: hsl(0, 0%, 83%);
+}
+.container-form{
+    width: 500px;
+}
+label{
+    font-size: 20px;
+}
+.date{
+    width: 250px;
+}

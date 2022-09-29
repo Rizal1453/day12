@@ -1,0 +1,105 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <title>Day6</title>
+        <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.2.1/dist/css/bootstrap.min.css">
+        <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.2.1/dist/js/bootstrap.bundle.min.js">
+        <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.2.0/css/all.min.css" rel="stylesheet">
+        <link rel="stylesheet" href="/public/css/project.css">
+    </head>
+    <body>
+      
+ <!-- navbar -->
+ <nav class="navbar navbar-expand-lg bg-light" style="height: 7vh;">
+  <div class="container">
+    <a class="navbar-brand" href="#"><img src="/public/images/logo.png" alt="https://dumbways.id/" width="45px"></a>
+    <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarTogglerDemo02"
+      aria-controls="navbarTogglerDemo02" aria-expanded="false" aria-label="Toggle navigation">
+      <span class="navbar-toggler-icon"></span>
+    </button>
+    <div class="collapse navbar-collapse" id="navbarTogglerDemo02">
+      <ul class="navbar-nav me-auto mb-2 mb-lg-0">
+        <li class="nav-item mx-4">
+          <a class="nav-link active fw-bold" aria-current="page" href="/home">Home</a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link" href="/form-project">Add Project</a>
+        </li>
+      </ul >
+      <a class="nav-link text-decoration-none me-3" href="">Register</a>
+      <a class="nav-link text-decoration-none me-3" href="">Login</a>
+      <a href="/contact">
+        <button class="btn btn-dark text-white" type="submit">
+          Contact Me
+        </button>
+      </a>
+    </div>
+  </div>
+</nav>
+  <!-- isi content -->
+        <div class="container mt-4"  style="width:500px ;">
+            <form action="/submitedit/{{.EDIT.ID}}" method="POST" class="mt-3 container-form">
+                <h2 class="text-center mt-5">ADD MY PROJECT</h2>
+                <div class="mt-4 ">
+                  <label for="input-project" class="form-label">Project Name</label>
+                  <input type="text" class="form-control border-0 shadow p-2 w-100 rounded" id="input-project" name="input-project" value="{{.EDIT.NamaProject}}" >
+                </div>
+                <div class="d-flex">
+                    <div class="date me-2 mb-3 ">
+                        <label for="input-start" class="form-label">Start Date</label>
+                        <input type="date" class="form-control border-0 shadow p-2 w-100 rounded" id="input-start" name="input-start" value="{{.EDIT.StartDate}}" >
+                    </div>
+                    <div class="date mb-3">
+                        <label for="input-end" class="form-label">End Date</label>
+                        <input type="date" class="form-control border-0 shadow p-2 w-100 rounded" id="input-end" name="input-end" value="{{.EDIT.EndDate}}">
+                    </div>
+                </div>
+                <div class="mb-3">
+                    <label for="floatingTextarea2" class="form-label">Description</label>
+                    <textarea class="form-control border-0 shadow p-2 w-100 rounded" id="floatingTextarea2" style="height: 100px" name="input-description" >{{.EDIT.Description}}</textarea>
+                </div>
+                <div>
+                    <label>Technologies</label>
+                    <table>
+                      <tr>
+                        <td>
+                          <input class="form-check-input" type="checkbox"  id="nodejs" value="node"  name="nodejs"/>
+                          <label class="ms-3 me-5" for="nodejs" >Node Js</label>
+                        </td>
+                        <td>
+                          <input class="ms-5 form-check-input" type="checkbox" id="vuejs" value="vue"  name="vuejs"/>
+                          <label class="ms-3" for="vuejs">Vue JS</label>
+                        </td>
+                      </tr>
+                      <tr>
+                        <td>
+                          <input class="form-check-input" type="checkbox" id="reactjs" value="react"  name="reactjs"/>
+                          <label class="me-5 ms-3" for="reactjs">React JS</label>
+                        </td>
+                        <td>
+                          <input class="ms-5 form-check-input" type="checkbox" id="java" value="java" name="java" />
+                          <label class="ms-3" for="java">Java</label>
+                        </td>
+                      </tr>
+                    </table>
+                </div>
+                <div class="mb-3 mt-4">
+                  <label for="" class="fs-5">Upload image</label>
+                  <div class="shadow">
+                    <label for="upload"class="d-flex bg-light justify-content-between align-items-center border-0 shadow p-0 w-100 rounded">
+                      <p class="m-0 p-2 fs-5" style="background-color:#e4e4e4 ;">Choose</p>
+                      <i class="fa-solid fa-paperclip fs-4 me-3"></i>
+                    </label>
+                    <input type="file" id="upload" name="gambar" hidden />
+                  </div>
+                </div>
+                <div class="d-flex justify-content-end">
+                    <button class="btn btn-dark px-5 rounded-pill" type="submit">submit</button>
+                </div>
+                
+            </form>    
+        </div>
+        <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.1/dist/js/bootstrap.bundle.min.js"></script>
+            
+    </body>
+</html>
